@@ -20,8 +20,8 @@ Start:
 
 		bsr	CopperSetSprite0
 		move.w	#$abc,$dff1a2
-		move.w	#$0f0,$dff1a4
-		move.w	#$00f,$dff1a6
+		move.w	#$abc,$dff1a4
+		move.w	#$abc,$dff1a6
 
 Mainloop:
 		bsr	VBlank
@@ -98,33 +98,32 @@ Joydown:	bset	#1,Players
 ;--------------------------------------------------------------
 
 Controls:	btst	#0,Players
-		bne	Red
-		btst	#1,Players
-		bne	Green
-		btst	#2,Players
-		bne	Yellow
-		btst	#3,Players
-		bne	Purple
-		rts
-Red:		cmp.w	#183,Player2+2
-		bge	.no
+		beq	.Green
+		cmp.w	#183,Player2+2
+		bge	.Green
 		addq.w	#3,Player2+2
-.no
-		rts
-Green:		cmp.w	#33,Player2+2
-		ble	.no
+
+.Green:
+		btst	#1,Players
+		beq	.Yellow
+		cmp.w	#33,Player2+2
+		ble	.Yellow
 		subq.w	#3,Player2+2
-.no
-		rts
-Yellow:		cmp.w	#33,Player1+2
-		ble	.no
+
+.Yellow:		
+		btst	#2,Players
+		beq	.Purple
+		cmp.w	#33,Player1+2
+		ble	.Purple
 		subq.w	#3,Player1+2
-.no
-		rts
-Purple:		cmp.w	#183,Player1+2
-		bge	.no
+
+.Purple:
+		btst	#3,Players
+		beq	.No
+		cmp.w	#183,Player1+2
+		bge	.No
 		addq.w	#3,Player1+2
-.no
+.No
 		rts
 
 ;--------------------------------------------------------------
