@@ -100,12 +100,12 @@ Green:		move.w	#$f0,$dff180
 		rts
 Yellow:		cmp.w	#33,Player1+2
 		ble	.no
-		sub.w	#2,Player1+2
+		sub.w	#3,Player1+2
 .no
 		rts
 Purple:		cmp.w	#183,Player1+2
 		bge	.no
-		add.w	#2,Player1+2
+		add.w	#3,Player1+2
 .no
 		rts
 
