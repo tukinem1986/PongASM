@@ -326,7 +326,7 @@ Sprite0:	dc.w	0
 		
 Colors:		dc.w $0000,$0cde	; paleta kolorow
 
-Bitmap:		incbin "DHC:Pongasm/pong.raw"
+Bitmap:		dcb.b	10240,0
 
 Shape:		;incbin digits.bin
 		dc.w %0111111111111000
