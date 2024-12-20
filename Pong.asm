@@ -98,11 +98,15 @@ Red:		move.w	#$f00,$dff180
 		rts
 Green:		move.w	#$f0,$dff180
 		rts
-Yellow:		;move.w	#$ff0,$dff180
+Yellow:		cmp.w	#33,Player1+2
+		ble	.no
 		sub.w	#2,Player1+2
+.no
 		rts
-Purple:		;move.w	#$f0f,$dff180
+Purple:		cmp.w	#183,Player1+2
+		bge	.no
 		add.w	#2,Player1+2
+.no
 		rts
 
 ;--------------------------------------------------------------
@@ -194,6 +198,18 @@ CopperSetSprite0:
 		move.w	d0,4(a0)
 		swap	d0
 		move.w	d0,(a0)
+
+Sprite1
+		swap	d0
+		move.w	d0,8(a0)
+		swap	d0
+		move.w	d0,12(a0)
+
+Sprite2
+		move.l	#Pilka,d0
+		move.w	d0,16(a0)
+		swap	d0
+		move.w	d0,18(a0)
 		rts
 
 ;--------------------------------------------------------------
