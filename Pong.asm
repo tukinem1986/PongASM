@@ -34,6 +34,18 @@ Mainloop:
 		lea	Paletka,a0
 		bsr	SpriteSet
 
+		move.l	#300,d0
+		move.w	Player2+2,d1
+		moveq	#32,d2
+		lea	Paletka2,a0
+		bsr	SpriteSet
+
+		move.l	#140,d0
+		move.l	#100,d1
+		moveq	#16,d2
+		lea	Pilka,a0
+		bsr 	SpriteSet
+
 		bsr	Keyboard
 		bsr	Joystick
 		bsr	Controls
@@ -94,18 +106,24 @@ Controls:	btst	#0,Players
 		btst	#3,Players
 		bne	Purple
 		rts
-Red:		move.w	#$f00,$dff180
+Red:		cmp.w	#183,Player2+2
+		bge	.no
+		addq.w	#3,Player2+2
+.no
 		rts
-Green:		move.w	#$f0,$dff180
+Green:		cmp.w	#33,Player2+2
+		ble	.no
+		subq.w	#3,Player2+2
+.no
 		rts
 Yellow:		cmp.w	#33,Player1+2
 		ble	.no
-		sub.w	#3,Player1+2
+		subq.w	#3,Player1+2
 .no
 		rts
 Purple:		cmp.w	#183,Player1+2
 		bge	.no
-		add.w	#3,Player1+2
+		addq.w	#3,Player1+2
 .no
 		rts
 
@@ -200,16 +218,16 @@ CopperSetSprite0:
 		move.w	d0,(a0)
 
 Sprite1
+		move.l	#Paletka2,d0
+		move.w	d0,12(a0)
 		swap	d0
 		move.w	d0,8(a0)
-		swap	d0
-		move.w	d0,12(a0)
 
 Sprite2
 		move.l	#Pilka,d0
-		move.w	d0,16(a0)
+		move.w	d0,20(a0)
 		swap	d0
-		move.w	d0,18(a0)
+		move.w	d0,16(a0)
 		rts
 
 ;--------------------------------------------------------------
@@ -296,7 +314,7 @@ OsRestore:
 ;--------------------------------------------------------------
 Players:	dc.w $0,$0	; %0000 pl2d pl2u pl1d pl1u ($ffff - wyjscie)
 Player1:	dc.w $0,$33	; punkty , Y
-Player2:	dc.w $0,$0	; punkty , Y
+Player2:	dc.w $0,$33	; punkty , Y
 Ball:		dc.w $0,$0	; X , Y
 
 ;--------------------------------------------------------------
@@ -681,6 +699,40 @@ Shape:		;incbin digits.bin
 SpriteFake:	dc.l 0,0,0,0
 
 Paletka:	dc.w	0,0
+		dc.w %0111111111111110,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w $ffff,$0
+		dc.w %0111111111111110,$0
+
+Paletka2:	dc.w 0,0
 		dc.w %0111111111111110,$0
 		dc.w $ffff,$0
 		dc.w $ffff,$0
