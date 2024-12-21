@@ -30,8 +30,8 @@
 ; 
 ; Editor
 ; -------------------------------------------------------
-; CursorLine      = 52
-; CursorColumn    = 6
+; CursorLine      = 9
+; CursorColumn    = 26
 ; LabelSearch     = ""
 ; LabelRemark     = 0
 ; LabelAll        = 0
@@ -79,6 +79,14 @@
 ; Max XBSound     = 10
 ; /XTRA
 WBStartup
+
+MOVE.b #%01111000,$bfd100
+NOP
+NOP
+ORI.b #%10000000,$bfd100
+NOP
+NOP
+ANDI.b #%10000111,$bfd100
 
 BitMap 2,16,32,2
 Cls 1 : Plot 0,0,0 : Plot 15,0,0 : Plot 0,31,0 : Plot 15,31,0
