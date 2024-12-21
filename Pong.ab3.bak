@@ -1,0 +1,129 @@
+; XTRA
+; Embedded .xtra Header
+; 
+; General Info
+; -------------------------------------------------------
+; ExePath         = ""
+; ExeFile         = ""
+; CreateIcon      = 1
+; Residents       = ""
+; 
+; Compiler
+; -------------------------------------------------------
+; StringBuffer    = 10240
+; MakeSmallest    = 1
+; FuncOptimize    = 1
+; Version         = 0.0.0
+; NumberOfBuilds  = 15
+; 
+; Debugger
+; -------------------------------------------------------
+; CliArgs         = ""
+; StackSize       = 8191
+; RuntimeDebug    = 0
+; DebugInfo       = 0
+; CreateDbgFile   = 0
+; OverflowCheck   = 0
+; AssemblerCheck  = 0
+; InterruptCheck  = 1
+; AutoRun         = 1
+; 
+; Editor
+; -------------------------------------------------------
+; CursorLine      = 36
+; CursorColumn    = 43
+; LabelSearch     = ""
+; LabelRemark     = 0
+; LabelAll        = 0
+; LabelCase       = 0
+; LabelPosition   = 0
+; 
+; Blitz Objects
+; -------------------------------------------------------
+; Max File        = 5
+; Max GadgetList  = 5
+; Max Shape       = 100
+; Max Bank        = 5
+; Max MenuList    = 5
+; Max GTList      = 20
+; Max Palette     = 4
+; Max BitMap      = 10
+; Max Screen      = 5
+; Max IntuiFont   = 5
+; Max BlitzFont   = 4
+; Max Window      = 20
+; Max IconInfo    = 1
+; Max MUIObject   = 50
+; Max AsyncReq    = 4
+; Max Req-Lib     = 5
+; Max GTMenuList  = 5
+; Max Console     = 5
+; Max TCPSock     = 5
+; Max Tape        = 5
+; Max TagList     = 5
+; Max Database    = 16
+; Max Sound       = 10
+; Max MedModule   = 8
+; Max Buffer      = 10
+; Max Queue       = 10
+; Max Sprite      = 20
+; Max Module      = 5
+; Max Slice       = 10
+; Max Page        = 4
+; Max CopList     = 10
+; Max PTModule    = 5
+; Max Anim        = 10
+; Max NChunky     = 50
+; Max Chunky      = 20
+; Max Stencil     = 5
+; Max XBSound     = 10
+; /XTRA
+WBStartup
+
+BitMap 0,320,256,1
+CopyMemQuick_ ?bitmapa,Peek.l(Addr BitMap(0)+8),$2800
+
+BitMap 1,160,32,1
+CopyMemQuick_ ?font,Peek.l(Addr BitMap(1)+8),640
+
+DEFTYPE .w y1,y2,ballX,ballY,ballXs,ballYs
+
+y1=33
+y2=33
+
+InitPalette 0,32
+PalRGB 0,0,$0,$0,$0
+PalRGB 0,1,$a,$c,$e
+
+VWait
+BLITZ
+
+Use BitMap 0
+JSR Punkty
+
+Slice 0,44,320,256,$fff8,1,8,32,320,320
+ShowPalette 0
+Show 0
+
+While NOT RawStatus($45)
+  VWait
+Wend
+BRA Koniec
+
+
+.Punkty
+BlockScroll punkty1 LSL 4,0,16,32,120,40,1
+BlockScroll punkty2 LSL 4,0,16,32,200,40,1
+RTS
+
+
+.Koniec
+
+AMIGA
+
+End
+
+
+
+bitmapa: IncBin "Pong.raw"
+font: IncBin "font.raw"
