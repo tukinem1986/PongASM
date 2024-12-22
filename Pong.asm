@@ -12,20 +12,19 @@ Start:
 		bsr	OsStore
 
 		bsr	Init_Colors
-		bsr	SpritesSetFake
+		;bsr	SpritesSetFake
 		bsr	Init_Screens
 		bsr	Punktacja
 		move.l	#Copper,$dff080
 		move.w	d0,$dff088
 
 		bsr	CopperSetSprite0
-		move.w	#$abc,$dff1a2
-		move.w	#$abc,$dff1a4
-		move.w	#$abc,$dff1a6
-
+		bsr	WaitFire
 Mainloop:
 		bsr	VBlank
 		move.b	#$0,Players
+
+		bsr	FizykaPilki
 
 		moveq	#0,d0		;pozycja x
 		move.l	d0,d1
@@ -40,8 +39,8 @@ Mainloop:
 		lea	Paletka2,a0
 		bsr	SpriteSet
 
-		move.l	#140,d0
-		move.l	#100,d1
+		move.w	Ball,d0
+		move.w	Ball+2,d1
 		moveq	#16,d2
 		lea	Pilka,a0
 		bsr 	SpriteSet
@@ -128,6 +127,60 @@ Controls:	btst	#0,Players
 
 ;--------------------------------------------------------------
 
+FizykaPilki:
+		move.w	BallSpeed,d0
+		move.w	BallSpeed+2,d1
+		add.w	d0,Ball
+		add.w	d1,Ball+2
+
+.LewaGranica:
+		cmp.w	#-16,Ball
+		bge	.PrawaGranica
+		add.w	#1,Player2
+		move.w	#140,Ball
+		move.w	#100,Ball+2
+		bsr	Punktacja
+		bsr	WaitFire
+.PrawaGranica	cmp.w	#320,Ball
+		ble	.GornaGranica
+		add.w	#1,Player1
+		move.w	#140,Ball
+		move.w	#100,Ball+2
+		bsr	Punktacja
+		bsr	WaitFire
+.GornaGranica
+		cmp.w	#33,Ball+2
+		bge	.DolnaGranica
+		neg.w	BallSpeed
+.DolnaGranica	
+		cmp.w	#198,Ball+2
+		ble	.dalej
+		neg.w	BallSpeed
+.dalej
+		rts
+;--------------------------------------------------------------
+
+WaitFire:	moveq	#0,d0
+		move.b	$bfec01,d0
+		ror.b	#1,d0
+		eor.b	#$ff,d0
+
+.Space		cmp.b	#$40,d0
+		bne	.Fire
+		bra	.UstawKierunek
+.Fire		btst	#7,$bfe001
+ 		bne	WaitFire
+
+.UstawKierunek
+		cmp.w	#160,Ball
+		bge	.RuchWPrawo
+.RuchWLewo:	move.w	#-3,BallSpeed
+		rts
+.RuchWPrawo	move.w	#3,BallSpeed
+
+		rts
+		
+;--------------------------------------------------------------
 Punktacja:	move.w	Player1,d0
 		moveq	#14,d1
 		bsr	Punkty
@@ -154,6 +207,8 @@ Init_Colors:	lea	Colors,a0
 Col_Nt:		move.w	(a0)+,2(a1)
 		adda.l	#4,a1
 		dbf	d7,Col_Nt
+		move.w	#$abc,$dff1a2 ; kolor 17
+		move.w	#$f00,$dff1a6 ; kolor 21
 		rts
 
 ;--------------------------------------------------------------
@@ -195,7 +250,7 @@ BlitWait:	btst #14-8,$dff002
 
 SpritesSetFake:
 		moveq #8-1,d0
-		lea Sprite0,a0
+		lea Sprite00,a0
 		move.l #SpriteFake,d1
 
 .loop		swap d1
@@ -209,7 +264,7 @@ SpritesSetFake:
 ;--------------------------------------------------------------
 
 CopperSetSprite0:
-		lea	Sprite0,a0
+		lea	Sprite00,a0
 		move.l	#Paletka,d0
 
 		move.w	d0,4(a0)
@@ -223,10 +278,11 @@ Sprite1
 		move.w	d0,8(a0)
 
 Sprite2
+		lea	Sprite02,a0
 		move.l	#Pilka,d0
-		move.w	d0,20(a0)
+		move.w	d0,44(a0)
 		swap	d0
-		move.w	d0,16(a0)
+		move.w	d0,40(a0)
 		rts
 
 ;--------------------------------------------------------------
@@ -314,8 +370,8 @@ OsRestore:
 Players:	dc.w $0,$0	; %0000 pl2d pl2u pl1d pl1u ($ffff - wyjscie)
 Player1:	dc.w $0,$33	; punkty , Y
 Player2:	dc.w $0,$33	; punkty , Y
-Ball:		dc.w $0,$0	; X , Y
-
+Ball:		dc.w 140,100	; X , Y
+BallSpeed:	dc.w 0,0	; XS,YS
 ;--------------------------------------------------------------
 gfxName:	dc.b "graphics.library",0
 	EVEN
@@ -349,9 +405,12 @@ Planes:		dc.l $00e00000,$00e20000; adresy bitplanow
 		dc.l $1007fffe		; czekamy na 10 linie
 
 		dc.w	$0120
-Sprite0:	dc.w	0
-		dc.l	$01220000
-		dc.l $01240000,$01260000
+Sprite00:	dc.w	0
+		dc.w	$0122
+Sprite01:	dc.w	0
+		dc.w	$0124
+Sprite02:	dc.w	$0
+		dc.w	$0126,0
 		dc.l $01280000,$012a0000
 		dc.l $012c0000,$012e0000
 		dc.l $01300000,$01320000
