@@ -30,8 +30,8 @@
 ; 
 ; Editor
 ; -------------------------------------------------------
-; CursorLine      = 9
-; CursorColumn    = 26
+; CursorLine      = 99
+; CursorColumn    = 35
 ; LabelSearch     = ""
 ; LabelRemark     = 0
 ; LabelAll        = 0
@@ -175,8 +175,8 @@ ballX+ballXs
 ballY+ballYs
 
 ;kolizje pionowe
-If ballY<33 Then ballYs=3
-If ballY>198 Then ballYs=-3
+If ballY<33 Then ballYs = -ballYs
+If ballY>198 Then ballYs = -ballYs
 
 ; Kolizje z lewa paletka
 If RectsHit(ballX,ballY,16,16,10,y1,16,16)
