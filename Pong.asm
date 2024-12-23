@@ -151,12 +151,57 @@ FizykaPilki:
 .GornaGranica
 		cmp.w	#33,Ball+2
 		bge	.DolnaGranica
-		neg.w	BallSpeed
+		neg.w	BallSpeed+2
 .DolnaGranica	
 		cmp.w	#198,Ball+2
-		ble	.dalej
-		neg.w	BallSpeed
-.dalej
+		ble	.Kolizje
+		neg.w	BallSpeed+2
+
+.Kolizje
+		move.w	Ball+2,d0	;D0 drugi word to Y pileczki
+		swap	d0
+		move.w	Ball,d0		;D0 pierwszy word to X pileczki
+		move.l	d0,d1		;D1 jako baza do dalszych obliczen
+		move.w	Player2+2,d2	;D2 drugi word to Y prawej paletki
+		swap	d2
+		move.w	Player1+2,d2	;D2 pierwszy word to Y lewej paletki
+		move.l	d2,d3		;D3 jako baza do dalszych obliczen
+
+.LewaGorna
+		cmp.w	#15,d0		;pozycja pozioma
+		bgt	.LewaDolna
+		swap	d0
+		
+		add.w	#15,d0
+		cmp.w	d0,d2
+		bgt	.LewaDolna
+
+		sub.w	#8,d0
+		add.w	#15,d2
+		cmp.w	d0,d2
+		blt	.LewaDolna
+		move.w	#2,BallSpeed
+		subq.w	#2,BallSpeed+2
+
+.LewaDolna
+		move.l	d1,d0
+		move.l	d3,d2
+		cmp.w	#15,d0
+		bgt	.PrawaGorna
+		swap	d0
+
+		add.w	#31,d2
+		cmp.w	d0,d2
+		blt	.PrawaGorna
+		sub.w	#15,d2
+		add.w	#8,d0
+		cmp.w	d0,d2
+		bgt	.PrawaGorna
+		move.w	#2,BallSpeed
+		addq.w	#2,BallSpeed+2
+
+.PrawaGorna
+
 		rts
 ;--------------------------------------------------------------
 
@@ -165,6 +210,10 @@ WaitFire:	moveq	#0,d0
 		ror.b	#1,d0
 		eor.b	#$ff,d0
 
+.Esc		cmp.b	#$45,d0
+		bne	.Space
+ 		move.w	#$ffff,Players
+ 		rts
 .Space		cmp.b	#$40,d0
 		bne	.Fire
 		bra	.UstawKierunek
@@ -208,7 +257,7 @@ Col_Nt:		move.w	(a0)+,2(a1)
 		adda.l	#4,a1
 		dbf	d7,Col_Nt
 		move.w	#$abc,$dff1a2 ; kolor 17
-		move.w	#$f00,$dff1a6 ; kolor 21
+		move.w	#$f00,$dff1a6 ; kolor 21 - NIE REAGUJE
 		rts
 
 ;--------------------------------------------------------------
@@ -368,7 +417,7 @@ OsRestore:
 
 ;--------------------------------------------------------------
 Players:	dc.w $0,$0	; %0000 pl2d pl2u pl1d pl1u ($ffff - wyjscie)
-Player1:	dc.w $0,$33	; punkty , Y
+Player1:	dc.w $0,100-15	; punkty , Y
 Player2:	dc.w $0,$33	; punkty , Y
 Ball:		dc.w 140,100	; X , Y
 BallSpeed:	dc.w 0,0	; XS,YS
@@ -789,6 +838,7 @@ Paletka:	dc.w	0,0
 		dc.w $ffff,$0
 		dc.w $ffff,$0
 		dc.w %0111111111111110,$0
+		dc.l 0
 
 Paletka2:	dc.w 0,0
 		dc.w %0111111111111110,$0
@@ -823,6 +873,7 @@ Paletka2:	dc.w 0,0
 		dc.w $ffff,$0
 		dc.w $ffff,$0
 		dc.w %0111111111111110,$0
+		dc.l 0
 
 ;jeśli chcesz żeby to był sprajt to muszą być najpierw dwa słowa albo jeden long 
 Pilka:		dc.l	0
@@ -842,3 +893,4 @@ Pilka:		dc.l	0
 		dc.w %0001111111111000,$0
 		dc.w %0000111111110000,$0
 		dc.w %0000001111000000,$0
+		dc.l 0
