@@ -137,14 +137,12 @@ FizykaPilki:
 		cmp.w	#-16,Ball
 		bge	.PrawaGranica
 		add.w	#1,Player2
-		move.w	#140,Ball
 		move.w	#100,Ball+2
 		bsr	Punktacja
 		bsr	WaitFire
 .PrawaGranica	cmp.w	#320,Ball
 		ble	.GornaGranica
 		add.w	#1,Player1
-		move.w	#140,Ball
 		move.w	#100,Ball+2
 		bsr	Punktacja
 		bsr	WaitFire
@@ -169,7 +167,7 @@ FizykaPilki:
 
 .LewaGorna
 		cmp.w	#15,d0		;pozycja pozioma
-		bgt	.LewaDolna
+		bgt	.PrawaGorna
 		swap	d0
 		
 		add.w	#15,d0
@@ -180,7 +178,7 @@ FizykaPilki:
 		add.w	#15,d2
 		cmp.w	d0,d2
 		blt	.LewaDolna
-		move.w	#2,BallSpeed
+		move.w	#3,BallSpeed
 		subq.w	#2,BallSpeed+2
 
 .LewaDolna
@@ -197,10 +195,51 @@ FizykaPilki:
 		add.w	#8,d0
 		cmp.w	d0,d2
 		bgt	.PrawaGorna
-		move.w	#2,BallSpeed
+		move.w	#3,BallSpeed
 		addq.w	#2,BallSpeed+2
 
 .PrawaGorna
+		move.l	d1,d0
+		move.l	d3,d2
+
+		add.w	#15,d0	; prawa strona pilki
+		cmp.w	#300,d0
+		blt	.Opusc
+
+		swap	d0	; Y pilki
+		swap	d2	; Y drugiej paletki
+
+		add.w	#15,d0
+		cmp.w	d0,d2
+		bgt	.PrawaDolna
+
+		sub.w	#8,d0
+		add.w	#15,d2
+		cmp.w	d0,d2
+		blt	.PrawaDolna
+		move.w	#-3,BallSpeed
+		subq.w	#2,BallSpeed+2
+.PrawaDolna
+		move.l	d1,d0
+		move.l	d3,d2
+		add.w	#15,d0
+		cmp.w	#300,d0
+		blt	.Opusc
+
+		swap	d0
+		swap	d2
+
+		add.w	#31,d2
+		cmp.w	d0,d2
+		blt	.Opusc
+		sub.w	#15,d2
+		add.w	#8,d0
+		cmp.w	d0,d2
+		bgt	.Opusc
+		move.w	#-3,BallSpeed
+		addq.w	#2,BallSpeed+2
+
+.Opusc
 
 		rts
 ;--------------------------------------------------------------
@@ -221,11 +260,13 @@ WaitFire:	moveq	#0,d0
  		bne	WaitFire
 
 .UstawKierunek
-		cmp.w	#160,Ball
+		cmp.w	#152,Ball
 		bge	.RuchWPrawo
 .RuchWLewo:	move.w	#-3,BallSpeed
+		move.w	#152,Ball
 		rts
 .RuchWPrawo	move.w	#3,BallSpeed
+		move.w	#152,Ball
 
 		rts
 		
@@ -246,9 +287,10 @@ Punktacja:
 		rts
 
 .ResetujPunkty
-		move.w	#0,Player1
-		move.w	#0,Player2
+		move.l	#$00000066,Player1
+		move.l	#$00000066,Player2
 		move.w	#0,BallSpeed+2
+		move.w	#$cba,$dff180
 		bra	Punktacja
 		rts
 
@@ -270,7 +312,7 @@ Col_Nt:		move.w	(a0)+,2(a1)
 		adda.l	#4,a1
 		dbf	d7,Col_Nt
 		move.w	#$abc,$dff1a2 ; kolor 17
-		move.w	#$f00,$dff1aa ; kolor 21 - NIE REAGUJE
+		move.w	#$abc,$dff1aa ; kolor 21 - NIE REAGUJE
 		rts
 
 ;--------------------------------------------------------------
@@ -334,17 +376,18 @@ CopperSetSprite0:
 		move.w	d0,(a0)
 
 Sprite1
+		lea	Sprite00,a0
 		move.l	#Paletka2,d0
 		move.w	d0,12(a0)
 		swap	d0
 		move.w	d0,8(a0)
 
 Sprite2
-		lea	Sprite02,a0
+		lea	Sprite00,a0
 		move.l	#Pilka,d0
-		move.w	d0,44(a0)
+		move.w	d0,20(a0)
 		swap	d0
-		move.w	d0,40(a0)
+		move.w	d0,16(a0)
 		rts
 
 ;--------------------------------------------------------------
@@ -430,8 +473,8 @@ OsRestore:
 
 ;--------------------------------------------------------------
 Players:	dc.w $0,$0	; %0000 pl2d pl2u pl1d pl1u ($ffff - wyjscie)
-Player1:	dc.w $0,100-15	; punkty , Y
-Player2:	dc.w $0,$33	; punkty , Y
+Player1:	dc.w $0,$66	; punkty , Y
+Player2:	dc.w $0,$66	; punkty , Y
 Ball:		dc.w 140,100	; X , Y
 BallSpeed:	dc.w 0,0	; XS,YS
 ;--------------------------------------------------------------
@@ -467,18 +510,15 @@ Planes:		dc.l $00e00000,$00e20000; adresy bitplanow
 		dc.l $1007fffe		; czekamy na 10 linie
 
 		dc.w	$0120
-Sprite00:	dc.w	0
-		dc.w	$0122
-Sprite01:	dc.w	0
-		dc.w	$0124
-Sprite02:	dc.w	$0
-		dc.w	$0126,0
-		dc.l $01280000,$012a0000
-		dc.l $012c0000,$012e0000
-		dc.l $01300000,$01320000
-		dc.l $01340000,$01360000
-		dc.l $01380000,$013a0000
-		dc.l $013c0000,$013e0000
+Sprite00:	dc.w	0,$0122,0,$0124	;\
+Sprite01:	dc.w	0,$0126,0,$0128	; \
+Sprite02:	dc.w	0,$012a,0,$012c	;  \
+Sprite03:	dc.w	0,$012e,0,$0130	; kanaly
+Sprite04:	dc.w	0,$0132,0,$0134	;   DMA
+Sprite05:	dc.w	0,$0136,0,$0138	;  /
+Sprite06:	dc.w	0,$013a,0,$013c	; /
+Sprite07:	dc.w	0,$013e		;/
+
 		dc.l $fffffffe		; koniec copperlisty
 		
 Colors:		dc.w $0000,$0cde	; paleta kolorow
@@ -896,14 +936,14 @@ Pilka:		dc.l	0
 		dc.w %0011111111111100,$0
 		dc.w %0111111111111110,$0
 		dc.w %0111111111111110,$0
+		dc.w %1111111111111101,$0
 		dc.w %1111111111111111,$0
-		dc.w %1111111111111111,$0
-		dc.w %1111111111111111,$0
-		dc.w %1111111111111111,$0
-		dc.w %0111111111111110,$0
-		dc.w %0111111111111110,$0
-		dc.w %0011111111111100,$0
-		dc.w %0001111111111000,$0
-		dc.w %0000111111110000,$0
-		dc.w %0000001111000000,$0
+		dc.w %1111111111111101,$0
+		dc.w %1111111111111011,$0
+		dc.w %0111111111111100,$0
+		dc.w %0111111111111010,$0
+		dc.w %0011111111110100,$0
+		dc.w %0001111110101000,$0
+		dc.w %0000110101010000,$0
+		dc.w %0000001010000000,$0
 		dc.l 0
