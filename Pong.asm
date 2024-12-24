@@ -204,7 +204,7 @@ FizykaPilki:
 
 		add.w	#15,d0	; prawa strona pilki
 		cmp.w	#300,d0
-		blt	.Opusc
+		blt	.YSLimit
 
 		swap	d0	; Y pilki
 		swap	d2	; Y drugiej paletki
@@ -224,22 +224,31 @@ FizykaPilki:
 		move.l	d3,d2
 		add.w	#15,d0
 		cmp.w	#300,d0
-		blt	.Opusc
+		blt	.YSLimit
 
 		swap	d0
 		swap	d2
 
 		add.w	#31,d2
 		cmp.w	d0,d2
-		blt	.Opusc
+		blt	.YSLimit
 		sub.w	#15,d2
 		add.w	#8,d0
 		cmp.w	d0,d2
-		bgt	.Opusc
+		bgt	.YSLimit
 		move.w	#-3,BallSpeed
 		addq.w	#2,BallSpeed+2
+.YSLimit
+		cmp.w	#4,BallSpeed+2
+		bge	.YSMAX
+		cmp.w	#-4,BallSpeed+2
+		ble	.YSMIN
+		rts
 
-.Opusc
+.YSMAX		move.w	#4,BallSpeed+2
+		rts
+.YSMIN		move.w	#-4,BallSpeed+2
+		
 
 		rts
 ;--------------------------------------------------------------
