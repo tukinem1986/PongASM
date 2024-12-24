@@ -230,13 +230,26 @@ WaitFire:	moveq	#0,d0
 		rts
 		
 ;--------------------------------------------------------------
-Punktacja:	move.w	Player1,d0
+Punktacja:	
+		cmp.w	#9,Player1
+		bgt	.ResetujPunkty
+		cmp.w	#9,Player2
+		bgt	.ResetujPunkty
+		
+		move.w	Player1,d0
 		moveq	#14,d1
 		bsr	Punkty
 
 		move.w	Player2,d0
 		moveq	#24,d1
 		bsr	Punkty
+		rts
+
+.ResetujPunkty
+		move.w	#0,Player1
+		move.w	#0,Player2
+		move.w	#0,BallSpeed+2
+		bra	Punktacja
 		rts
 
 ;--------------------------------------------------------------
@@ -257,7 +270,7 @@ Col_Nt:		move.w	(a0)+,2(a1)
 		adda.l	#4,a1
 		dbf	d7,Col_Nt
 		move.w	#$abc,$dff1a2 ; kolor 17
-		move.w	#$f00,$dff1a6 ; kolor 21 - NIE REAGUJE
+		move.w	#$f00,$dff1aa ; kolor 21 - NIE REAGUJE
 		rts
 
 ;--------------------------------------------------------------
